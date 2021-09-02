@@ -327,16 +327,12 @@ class Wahway
             $indexArr = [$indexArr];
         }
 
-        $data = array_reduce($indexArr, function($carry, $item) {
-            return "<Index>${item}</Index>";
-        });
-
         $curlObj0 = Client::init($this->baseUrl . '/api/sms/delete-sms', 'POST')
             ->cookieJar($this->cookieJar)
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->set('referer', $this->baseUrl . '/html/content.html')
-            ->set('postFields', '<?xml version="1.0" encoding="UTF-8"?><request>' . $data . '</request>')
+            ->set('postFields', '<?xml version="1.0" encoding="UTF-8"?>' . $this->xmlStringify('request', ['Index' => $indexArr]))
             ->exec();
 
         if (!$curlObj0->getStatus()) {
