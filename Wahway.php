@@ -217,7 +217,7 @@ class Wahway
      */
     private function freshToken($header = null)
     {
-        if ($token) {
+        if ($header) {
             if (preg_match('/__RequestVerificationToken: (.{32})/', $header, $tokenTmp)) {
                 $this->token = $tokenTmp[1];
                 return $this->token;
@@ -273,7 +273,7 @@ class Wahway
 
         $data = $this->xmlParse($curlObj0->getBody());
 
-        if ($data['code']) {
+        if (isset($data['code'])) {
             throw new \Exception("Login error {$data['code']}");
         }
 
