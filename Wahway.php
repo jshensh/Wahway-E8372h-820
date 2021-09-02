@@ -93,7 +93,7 @@ class Wahway
      * @return string
      */
     private function xmlStringify($name, $obj) {
-        $xmlstr;
+        $xmlstr = '';
         if (is_string($obj) || is_numeric($obj)) {
             $xmlstr = "<${name}>${obj}</${name}>";
         } else if (is_array($obj)) {
