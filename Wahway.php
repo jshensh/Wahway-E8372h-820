@@ -80,7 +80,7 @@ class Wahway
      */
     private function xmlParse($str)
     {
-        return (array) simplexml_load_string($str);
+        return json_decode(json_encode(simplexml_load_string($str)), 1);
     }
 
     /**
