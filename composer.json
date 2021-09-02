@@ -1,0 +1,6 @@
+{
+    "require": {
+        "jshensh/php-curl-class": "^0.0.18",
+        "phpseclib/phpseclib": "^3.0"
+    }
+}
