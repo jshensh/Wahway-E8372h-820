@@ -402,7 +402,7 @@ class Wahway
 
         $data = $this->aesDecrypt($data['pwd'], $nonce['nonce'], $nonce['salt'], $data['iter'], $data['hash']);
         $data = $this->xmlParse(substr($data, strpos($data, '<response>')));
-        $data['messages']['message'] = isset($tmpList['messages']['message']['phone']) ? [$data['messages']['message']] : $data['messages']['message'];
+        $data['messages']['message'] = isset($data['messages']['message']['phone']) ? [$data['messages']['message']] : $data['messages']['message'];
 
         return $data;
     }
