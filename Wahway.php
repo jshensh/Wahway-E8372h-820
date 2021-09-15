@@ -17,15 +17,6 @@ use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Math\BigInteger;
 use phpseclib3\Crypt\AES;
 
-Client::setConf('userAgent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36');
-Client::setConf('customHeader', [
-    'Connection: keep-alive',
-    'Accept: */*',
-    'X-Requested-With: XMLHttpRequest',
-    'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-    '_ResponseSource: Broswer'
-]);
-
 class Wahway
 {
     const SMS_TEXT_MODE_UCS2 = 0;
@@ -39,6 +30,18 @@ class Wahway
             $cookieJar = [],
             $token,
             $publicKey = null;
+
+    private function request($url, $method = 'GET')
+    {
+        return Client::init($url, $method)
+            ->cookieJar($this->cookieJar)
+            ->setHeader('Connection', 'keep-alive')
+            ->setHeader('Accept', '*/*')
+            ->setHeader('X-Requested-With', 'XMLHttpRequest')
+            ->setHeader('Accept-Language', 'zh-CN,zh;q=0.9,en;q=0.8')
+            ->setHeader('_ResponseSource', 'Broswer')
+            ->set('userAgent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36');
+    }
 
     private function __construct($baseUrl, $password)
     {
@@ -193,8 +196,7 @@ class Wahway
      */
     private function monitoringStatus()
     {
-        $curlObj0 = Client::init($this->baseUrl . '/api/monitoring/status')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/monitoring/status')
             ->setHeader('Update-Cookie', 'UpdateCookie')
             ->set('referer', $this->baseUrl . '/html/index.html?noredirect')
             ->exec();
@@ -225,8 +227,7 @@ class Wahway
             return false;
         }
 
-        $curlObj0 = Client::init($this->baseUrl . '/api/webserver/token')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/webserver/token')
             ->set('referer', $this->baseUrl . '/html/index.html?noredirect')
             ->exec();
 
@@ -258,8 +259,7 @@ class Wahway
         $firstnonce = bin2hex(random_bytes(32));
         $token = $this->freshToken();
 
-        $curlObj0 = Client::init($this->baseUrl . '/api/user/challenge_login', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/user/challenge_login', 'POST')
             ->setHeader('__RequestVerificationToken', $token)
             ->setHeader('Origin', $this->baseUrl)
             ->set('referer', $this->baseUrl . '/html/index.html?noredirect')
@@ -287,8 +287,7 @@ class Wahway
 
         $token = $this->freshToken($curlObj0->getHeader());
 
-        $curlObj1 = Client::init($this->baseUrl . '/api/user/authentication_login', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj1 = $this->request($this->baseUrl . '/api/user/authentication_login', 'POST')
             ->setHeader('__RequestVerificationToken', $token)
             ->setHeader('Origin', $this->baseUrl)
             ->set('referer', $this->baseUrl . '/html/index.html?noredirect')
@@ -327,8 +326,7 @@ class Wahway
             $indexArr = [$indexArr];
         }
 
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/delete-sms', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/delete-sms', 'POST')
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->set('referer', $this->baseUrl . '/html/content.html')
@@ -354,8 +352,7 @@ class Wahway
      */
     public function smsCount()
     {
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-count')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/sms-count')
             ->set('referer', $this->baseUrl . '/html/content.html')
             ->exec();
 
@@ -378,9 +375,8 @@ class Wahway
     public function smsCountContact()
     {
         $smsCount = $this->smsCount();
-        
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-count-contact')
-            ->cookieJar($this->cookieJar)
+
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/sms-count-contact')
             ->set('referer', $this->baseUrl . '/html/content.html')
             ->exec();
 
@@ -409,8 +405,7 @@ class Wahway
     {
         $nonce = $this->getNonce();
 
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-list-contact', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/sms-list-contact', 'POST')
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->set('referer', $this->baseUrl . '/html/content.html')
@@ -443,8 +438,7 @@ class Wahway
      */
     public function smsCountPhone($phone)
     {
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-count-contact', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/sms-count-contact', 'POST')
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8;enc')
@@ -483,8 +477,7 @@ class Wahway
             'nonce'     => $nonce['encryptData']
         ];
 
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-list-phone', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/sms-list-phone', 'POST')
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8;enc')
@@ -533,8 +526,7 @@ class Wahway
             'Date'     => date('Y-m-d H:i:s')
         ];
 
-        $curlObj0 = Client::init($this->baseUrl . '/api/sms/send-sms', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/sms/send-sms', 'POST')
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8;enc')
@@ -563,8 +555,7 @@ class Wahway
      */
     public function logout()
     {
-        $curlObj0 = Client::init($this->baseUrl . '/api/user/logout', 'POST')
-            ->cookieJar($this->cookieJar)
+        $curlObj0 = $this->request($this->baseUrl . '/api/user/logout', 'POST')
             ->setHeader('__RequestVerificationToken', $this->token)
             ->setHeader('Origin', $this->baseUrl)
             ->set('referer', $this->baseUrl . '/html/content.html')
