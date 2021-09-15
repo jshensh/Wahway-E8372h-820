@@ -346,6 +346,29 @@ class Wahway
     }
 
     /**
+     * 获取短信数量
+     *
+     * @access public
+     *
+     * @return integer
+     */
+    public function smsCount()
+    {
+        $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-count')
+            ->cookieJar($this->cookieJar)
+            ->set('referer', $this->baseUrl . '/html/content.html')
+            ->exec();
+
+        if (!$curlObj0->getStatus()) {
+            throw new \Exception('Curl Error', $curlObj0->getCurlErrNo());
+        }
+
+        $data = $this->xmlParse($curlObj0->getBody());
+
+        return $data;
+    }
+
+    /**
      * 获取短信会话数量
      *
      * @access public
@@ -354,6 +377,8 @@ class Wahway
      */
     public function smsCountContact()
     {
+        $smsCount = $this->smsCount();
+        
         $curlObj0 = Client::init($this->baseUrl . '/api/sms/sms-count-contact')
             ->cookieJar($this->cookieJar)
             ->set('referer', $this->baseUrl . '/html/content.html')
@@ -516,6 +541,7 @@ class Wahway
             ->set('referer', $this->baseUrl . '/html/content.html')
             ->set('postFields', $this->rsaEncrypt('<?xml version=\"1.0\" encoding=\"UTF-8\"?>' . $this->xmlStringify('request', $data)))
             ->set('postFieldsBuildQuery', false)
+            ->set('timeout', 30)
             ->exec();
 
         if (!$curlObj0->getStatus()) {
