@@ -50,7 +50,8 @@ class Wahway
         $this->login();
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->logout();
     }
 
@@ -95,7 +96,8 @@ class Wahway
      *
      * @return string
      */
-    private function xmlStringify($name, $obj) {
+    private function xmlStringify($name, $obj)
+    {
         $xmlstr = '';
         if (is_string($obj) || is_numeric($obj)) {
             $xmlstr = "<${name}>${obj}</${name}>";
